@@ -50,7 +50,9 @@ Lab5B-Semgrep-Insecure-File-Handling/
 │   ├── rejected_traversal_console.txt # verbatim transcript: rejections
 │   └── screenshots/                   # 7 genuine screenshots
 ├── report/
-│   └── Lab5B_Report.md
+│   ├── Lab5B_Report.md
+│   ├── Lab_5B_Semgrep_Insecure_File_Handling_Aditey_Mehra.docx
+│   └── Lab_5B_Semgrep_Insecure_File_Handling_Aditey_Mehra.pdf
 ├── README.md
 └── .gitignore
 ```
