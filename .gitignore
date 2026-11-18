@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test fixtures created at runtime
+safe_files/escape_link.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/

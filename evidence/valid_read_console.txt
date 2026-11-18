@@ -1,0 +1,19 @@
+LAB 5B - CONSOLE TRANSCRIPT: VALID FILE READ
+===========================================
+
+Working directory: safe_files/
+Input: valid.txt (in-scope file)
+
+$ printf "valid.txt\n" | python3 ../vulnerable.py
+Enter filename: Lab 5B valid file.
+This file lives inside the permitted safe_files/ directory.
+It is safe to read with either implementation.
+
+
+$ printf "valid.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Lab 5B valid file.
+This file lives inside the permitted safe_files/ directory.
+It is safe to read with either implementation.
+
+
+Result: both programs read the in-scope file successfully.

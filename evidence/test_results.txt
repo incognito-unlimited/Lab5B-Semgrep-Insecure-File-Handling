@@ -1,0 +1,114 @@
+==============================================================================
+LAB 5B - FUNCTIONAL SECURITY TEST RESULTS
+==============================================================================
+Generated (UTC): 2026-11-18 00:01:44
+Python: 3.14.4 (linux)
+Project root: /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling
+Safe directory: /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/safe_files
+Working directory for both programs: /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/safe_files
+Synthetic outside markers: /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/secret.txt, /mnt/d/Projects/outside.txt
+
+Classification: ALLOWED = in-scope file read; ESCAPED = out-of-scope content disclosed; REJECTED = controlled refusal; TRACEBACK = unhandled exception.
+
+Fixture: created symlink /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/safe_files/escape_link.txt -> ../secret.txt
+
+------------------------------------------------------------------------------
+TEST 1: input = 'valid.txt'
+Expected: Read the permitted in-scope file successfully.
+
+  vulnerable.py  -> ALLOWED (in-scope file read) (exit 0)
+    stdout: 'Enter filename: Lab 5B valid file.\nThis file lives inside the permitted safe_files/ directory.\nIt is safe to read with either implementation.'
+    stderr: ''
+
+  secure_file_reader.py -> ALLOWED (in-scope file read) (exit 0)
+    stdout: 'Enter filename: Lab 5B valid file.\nThis file lives inside the permitted safe_files/ directory.\nIt is safe to read with either implementation.'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 2: input = '../secret.txt'
+Expected: Reject single-step traversal.
+
+  vulnerable.py  -> ESCAPED (outside marker leaked) (exit 0)
+    stdout: 'Enter filename: OUTSIDE-MARKER: this synthetic file is OUTSIDE safe_files/.\nIt contains no real sensitive data and is used only for the lab test.'
+    stderr: ''
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Access outside the permitted directory is not allowed'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 3: input = '../../outside.txt'
+Expected: Reject multi-step traversal.
+
+  vulnerable.py  -> ESCAPED (outside marker leaked) (exit 0)
+    stdout: 'Enter filename: OUTSIDE-MARKER: this synthetic file is OUTSIDE safe_files/.\nIt is used only as a harmless Lab 5B test fixture.'
+    stderr: ''
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Access outside the permitted directory is not allowed'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 4: input = '/mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/secret.txt'
+Expected: Reject an absolute path.
+
+  vulnerable.py  -> ESCAPED (outside marker leaked) (exit 0)
+    stdout: 'Enter filename: OUTSIDE-MARKER: this synthetic file is OUTSIDE safe_files/.\nIt contains no real sensitive data and is used only for the lab test.'
+    stderr: ''
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Absolute paths are not allowed'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 5: input = ''
+Expected: Reject an empty filename cleanly.
+
+  vulnerable.py  -> TRACEBACK (exit 1)
+    stdout: 'Enter filename:'
+    stderr: 'Traceback (most recent call last):\n  File "/mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/vulnerable.py", line 3, in <module>\n    with open(filename, "r", encoding="utf-8") as file:\n         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'\''
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Filename must be a non-empty string'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 6: input = 'missing.txt'
+Expected: Handle a missing file without a traceback.
+
+  vulnerable.py  -> TRACEBACK (exit 1)
+    stdout: 'Enter filename:'
+    stderr: 'Traceback (most recent call last):\n  File "/mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/vulnerable.py", line 3, in <module>\n    with open(filename, "r", encoding="utf-8") as file:\n         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: \'missing.'
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Requested file does not exist'
+    stderr: ''
+
+------------------------------------------------------------------------------
+TEST 7: input = 'escape_link.txt'
+Expected: Reject a symlink whose resolved target is outside safe_files/.
+
+  vulnerable.py  -> ESCAPED (outside marker leaked) (exit 0)
+    stdout: 'Enter filename: OUTSIDE-MARKER: this synthetic file is OUTSIDE safe_files/.\nIt contains no real sensitive data and is used only for the lab test.'
+    stderr: ''
+
+  secure_file_reader.py -> REJECTED / CLEAN ERROR (exit 0)
+    stdout: 'Enter filename: Error: Access outside the permitted directory is not allowed'
+    stderr: ''
+
+==============================================================================
+SUMMARY
+==============================================================================
+1. 'valid.txt': vulnerable: ALLOWED (in-scope file read) | secure: ALLOWED (in-scope file read)
+2. '../secret.txt': vulnerable: ESCAPED (outside marker leaked) | secure: REJECTED / CLEAN ERROR
+3. '../../outside.txt': vulnerable: ESCAPED (outside marker leaked) | secure: REJECTED / CLEAN ERROR
+4. '/mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/secret.txt': vulnerable: ESCAPED (outside marker leaked) | secure: REJECTED / CLEAN ERROR
+5. '': vulnerable: TRACEBACK | secure: REJECTED / CLEAN ERROR
+6. 'missing.txt': vulnerable: TRACEBACK | secure: REJECTED / CLEAN ERROR
+7. 'escape_link.txt': vulnerable: ESCAPED (outside marker leaked) | secure: REJECTED / CLEAN ERROR
+
+Vulnerable program leaked out-of-scope content in 4 of 7 cases and produced unhandled tracebacks in 2 of 7 cases.
+Secure program rejected all traversal, absolute-path and symlink cases, returned clean errors for empty/missing input, and read the valid file.
+RESULT: PASS - secure_file_reader.py enforces the safe-directory boundary.
+
+Cleanup: removed temporary symlink /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/safe_files/escape_link.txt

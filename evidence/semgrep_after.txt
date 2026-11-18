@@ -1,0 +1,69 @@
+================================================================================
+LAB 5B - SEMGREP ANALYSIS: AFTER REMEDIATION
+================================================================================
+
+Date/time (UTC): 2026-11-18 00:00:35 UTC
+Semgrep version: 1.185.0
+Working directory: /mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling
+Platform: Linux 6.18.58.1-microsoft-standard-WSL2 x86_64
+Python: Python 3.14.4
+
+RULESET 1 (registry): p/python - Semgrep registry Python security/audit rules
+RULESET 2 (custom):   rules/insecure_file_handling.yml - documented rule for input() -> direct open()
+
+Both rulesets are applied identically to vulnerable.py and secure_file_reader.py.
+
+--------------------------------------------------------------------------------
+RUN 1: registry ruleset (text output)
+Command: semgrep scan --config p/python secure_file_reader.py
+--------------------------------------------------------------------------------
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 151 Code rules:
+  Scanning 1 file with 151 python rules.
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 151
+ • Targets scanned: 1
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 151 rules on 1 file: 0 findings.
+(need more rules? `semgrep login` for additional free Semgrep Registry rules)
+
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/
+
+--------------------------------------------------------------------------------
+RUN 2: custom rule (text output)
+Command: semgrep scan --config rules/insecure_file_handling.yml secure_file_reader.py
+--------------------------------------------------------------------------------
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 1 Code rule:
+  Scanning 1 file.
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 1
+ • Targets scanned: 1
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 1 rule on 1 file: 0 findings.
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/
+

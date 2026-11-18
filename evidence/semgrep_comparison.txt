@@ -1,0 +1,72 @@
+================================================================================
+LAB 5B - SEMGREP BEFORE / AFTER COMPARISON
+================================================================================
+
+Toolchain (identical for both scans)
+  Semgrep version : 1.185.0 (OSS engine, /home/aditey/semgrep-venv)
+  Platform        : Linux 6.18.58.1-microsoft-standard-WSL2 x86_64
+  Python          : 3.14.4
+  Ruleset 1       : p/python (Semregistry Python security/audit, 151 rules)
+  Ruleset 2       : rules/insecure_file_handling.yml (documented custom rule)
+  Before target   : vulnerable.py
+  After target    : secure_file_reader.py
+  Note            : Version, rulesets and options are identical; only the
+                    target file changed.
+
+--------------------------------------------------------------------------------
+RULESET 1 - p/python (151 rules)
+--------------------------------------------------------------------------------
+  Findings before : 0
+  Findings after  : 0
+  Interpretation  : The registry ruleset does not model this specific
+                    input() -> direct open() data flow. It produced no
+                    finding in either scan, so it neither confirmed nor
+                    refuted the vulnerability.
+
+--------------------------------------------------------------------------------
+RULESET 2 - custom rule (1 rule)
+--------------------------------------------------------------------------------
+  Rule ID         : rules.python-insecure-file-handling-unvalidated-filename
+  Severity        : ERROR (reported as "Blocking" in text output)
+  Confidence      : HIGH (declared in the YAML; Semgrep OSS does not emit it
+                    in JSON extra)
+  Findings before : 1  (vulnerable.py, lines 1-4)
+  Findings after  : 0
+  Message         : User-controlled input from input() is passed directly to
+                    open() without path validation or a containment check.
+
+  Matched source (verbatim from evidence/semgrep_before.txt):
+      1┆ filename = input("Enter filename: ")
+      2┆
+      3┆ with open(filename, "r", encoding="utf-8") as file:
+      4┆     print(file.read())
+
+  Note: Semgrep OSS returns "requires login" for JSON "lines" and
+  "fingerprint" fields. The genuine matched source is preserved in the
+  human-readable text evidence.
+
+--------------------------------------------------------------------------------
+AGGREGATE COMPARISON
+--------------------------------------------------------------------------------
+  Metric                      | Before | After
+  ----------------------------+--------+------
+  Total findings (both sets)  | 1      | 0
+  Insecure file-access findings| 1      | 0
+  Blocking / ERROR findings    | 1      | 0
+  Other findings               | 0      | 0
+  Rules run                    | 151+1  | 151+1
+  Scan errors                  | 0      | 0
+
+  Findings removed : 1
+    - rules.python-insecure-file-handling-unvalidated-filename
+      (vulnerable.py:1-4, ERROR, resolved by resolved-path containment)
+
+  Remaining findings : 0
+
+--------------------------------------------------------------------------------
+CONCLUSION
+--------------------------------------------------------------------------------
+The documented custom rule detected the direct insecure open() before
+remediation and reported zero findings after the safe-directory fix, using
+the identical Semgrep version and configuration. The clean static result is
+corroborated by the functional tests in evidence/test_results.txt.

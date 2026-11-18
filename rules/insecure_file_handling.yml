@@ -1,0 +1,17 @@
+rules:
+  - id: python-insecure-file-handling-unvalidated-filename
+    languages:
+      - python
+    severity: ERROR
+    confidence: HIGH
+    message: >-
+      User-controlled input from input() is passed directly to open() without
+      path validation or a containment check. A filename such as ../secret.txt
+      or an absolute path can escape the intended directory and disclose
+      unauthorised local files. Resolve the target path and verify that the
+      resolved path remains inside a fixed safe directory before opening it.
+    pattern: |
+      $FILENAME = input(...)
+      ...
+      with open($FILENAME, ...) as $FILE:
+        ...

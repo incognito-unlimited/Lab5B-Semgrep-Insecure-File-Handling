@@ -1,0 +1,25 @@
+LAB 5B - CONSOLE TRANSCRIPT: REJECTED TRAVERSAL ATTEMPTS
+========================================================
+
+Working directory: safe_files/
+Fixture: escape_link.txt is a symlink to ../secret.txt
+
+$ printf "../secret.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Access outside the permitted directory is not allowed
+
+$ printf "../../outside.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Access outside the permitted directory is not allowed
+
+$ printf "/mnt/d/Projects/Lab5B-Semgrep-Insecure-File-Handling/secret.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Absolute paths are not allowed
+
+$ printf "\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Filename must be a non-empty string
+
+$ printf "missing.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Requested file does not exist
+
+$ printf "escape_link.txt\n" | python3 ../secure_file_reader.py
+Enter filename: Error: Access outside the permitted directory is not allowed
+
+Result: every out-of-scope path was rejected with a clear, generic message.
